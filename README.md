@@ -4,10 +4,26 @@ A simple language which compiles to Java bytecode.
 
 ## Syntax
 
-```
-state Name {
-    transition(ToState) {
+```stag
+state State {
+    int value;
+
+    transition ToState {
         // transition rule logic
     }
 }
 ```
+
+```stag
+machima Machine initial State {
+    int variable;
+
+    someMethod(int param) {
+        variable = state.value;
+        out("State value %d\n", variable);
+        // ...
+        transition to(NewState);
+    }
+}
+```
+
