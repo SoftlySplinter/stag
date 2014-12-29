@@ -13,3 +13,8 @@ hs_err_pid*
 
 # Maven build
 target/
+
+# Eclipse
+.classpath
+.project
+.settings
