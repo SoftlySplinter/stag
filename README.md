@@ -11,7 +11,7 @@ The syntax of Stag is Java-like, but stripped down with several macros to speed 
 1. Classes are inferred from the filename
 2. Visibility defaults to public. The Java default is specified through the keyword `package`
 3. Method selection based on a `when` clause in the method definition
-4. `=` signifies equality, `==` signifies deep equality (`.equals(Object)`). `:` signifies assignment.
+4. `=` signifies equality, `==` signifies shallow equality (`.equals(Object)`). `:` signifies assignment.
 
 ## Examples
 

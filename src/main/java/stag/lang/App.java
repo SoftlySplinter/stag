@@ -1,7 +1,11 @@
 package stag.lang;
 
+import java.io.IOException;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import stag.lang.ref.Lexer;
 
 /**
  * 
@@ -12,10 +16,13 @@ public class App {
 	public static final Logger LOG = Logger.getLogger("stag");
 
 	static {
+		ConsoleHandler handler = new ConsoleHandler();
+		handler.setLevel(Level.ALL);
 		LOG.setLevel(Level.ALL);
+		LOG.addHandler(handler);
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		LOG.entering(App.class.getName(), "main", args);
 		
 		if(args.length < 1) {
@@ -30,7 +37,7 @@ public class App {
 		LOG.fine("Source file: " + source);
 		
 		Lexer lexer = Lexer.analyse(source);
-		
+		stag.lang.comp.Compiler.compiler(lexer);
 		
 		LOG.exiting(App.class.getName(), "main");
 	}
