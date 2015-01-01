@@ -1,6 +1,7 @@
 package stag.lang.ref;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 
 import stag.lang.App;
 
@@ -19,16 +20,29 @@ public class Reference {
 	
 	@Override
 	public String toString() {
-		String ret = String.format("%s: ", this.type.toString());
-		for(byte b : u2(this.type.tag)) {
-			ret += String.format("0x%02x ", b);
+		return String.format("%s (%s): %s%s", this.type.toString(), this.stringValue(), Utils.str(Utils.u2(this.type.tag)), Utils.str(this.value));
+	}
+
+	private String stringValue() {
+		switch(this.type) {
+		case String:
+			byte[] strB = new byte[this.value.length - 2];
+			for(int i = 2; i < this.value.length; i++) {
+				strB[i - 2] = this.value[i];
+			}
+			return new String(strB, Charset.defaultCharset());
+		case StringRef:
+		case ClassRef:
+		case FieldRef:
+		case MethodRef:
+		case InterfaceMethodRef:
+			return String.valueOf(Utils.b2s(this.value));
+		case Int:
+			return String.valueOf(Utils.b2i(this.value));
+		default:
+			return "???";
 		}
 		
-		for(byte b : this.value) {
-			ret += String.format("0x%02x ", b);
-		}
-		
-		return ret;
 	}
 
 	public static Reference string(final String value) {
@@ -36,7 +50,7 @@ public class Reference {
 		final byte[] bytes = value.getBytes();
 		
 		final ByteBuffer buf = ByteBuffer.allocate(2 + bytes.length);
-		buf.put(u2(bytes.length));
+		buf.put(Utils.u2(bytes.length));
 		buf.put(bytes);
 		
 		final Reference ref = new Reference(Type.String, buf.array());
@@ -49,14 +63,10 @@ public class Reference {
 		final Type type = Type.ClassRef;
 		
 		final ByteBuffer buffer = ByteBuffer.allocate(type.bytes);
-		buffer.put(u2(classNameReference));
+		buffer.put(Utils.u2(classNameReference));
 		
 		final Reference ref = new Reference(type, buffer.array());
 		App.LOG.exiting(Reference.class.getName(), "string", ref);
 		return ref;
-	}
-	
-	public static byte[] u2(int value) {
-		return ByteBuffer.allocate(2).putShort((short) value).array();
 	}
 }

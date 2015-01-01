@@ -3,10 +3,14 @@ package stag.lang.ref;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 import stag.lang.App;
+import stag.lang.ref.attr.CodeAttribute;
 /**
  * Lexical Analyser for the Stag programming language.
  * 
@@ -15,17 +19,23 @@ import stag.lang.App;
  */
 public class Lexer {
 	/** The references in a source file */
-	public final ReferenceList references;
+	public final ConstantPool constPool;
+
+	public final List<Interface> interfaces;
+	public final List<Method> methods;
 	
 	public final String source;
 	
 	private int thisRef = -1;
 	private int superRef = -1;
+
 	
 	private Lexer(String source) {
 		App.LOG.entering(getClass().getName(), "<init>", source);
 		
-		this.references = new ReferenceList();
+		this.constPool = new ConstantPool();
+		this.interfaces = new ArrayList<Interface>();
+		this.methods = new ArrayList<Method>();
 		this.source = source;
 		
 		App.LOG.exiting(getClass().getName(), "<init>");
@@ -42,16 +52,16 @@ public class Lexer {
 		
 		try(BufferedReader reader = Files.newBufferedReader(sourceFile.toPath(), Charset.forName("UTF-8"))) {
 			// Set up the references for this.
-			int classNameReference = this.references.put(Reference.string(className));
-			thisRef = this.references.put(Reference.classRef(classNameReference));
+			int classNameReference = this.constPool.put(Reference.string(className));
+			thisRef = this.constPool.put(Reference.classRef(classNameReference));
 			
 			// Parse the file
 			parse(reader);
 			
 			// Superclass is object if one was not found during parsing.
 			if(this.superRef == -1) {
-				int objectNameReference = this.references.put(Reference.string("java/lang/Object"));
-				superRef = this.references.put(Reference.classRef(objectNameReference));
+				int objectNameReference = this.constPool.put(Reference.string("java/lang/Object"));
+				superRef = this.constPool.put(Reference.classRef(objectNameReference));
 			}
 		}
 		
@@ -64,6 +74,15 @@ public class Lexer {
 		for(String line = reader.readLine(); line != null; line = reader.readLine()) {
 			App.LOG.finest("Read line: " + line);
 		}
+
+		App.LOG.config("[test] Adding interface " + Serializable.class);
+		this.interfaces.add(new Interface("java/io/Serializable", constPool));
+		
+		App.LOG.config("[test] Adding main method");
+		Method main = new Method(Method.PUBLIC, "main", new Descriptor(this.constPool, "void", "java/lang/String[]"), this.constPool);
+		Attribute attr = new CodeAttribute(0, 0, new byte[0], new byte[0], new Attribute[0], constPool);
+		main.attributes.add(attr);
+		this.methods.add(main);
 
 		App.LOG.exiting(getClass().getName(), "parse");
 	}
