@@ -1,10 +1,12 @@
 package stag.lang;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import stag.lang.comp.Compiler;
 import stag.lang.ref.Lexer;
 
 /**
@@ -16,13 +18,13 @@ public class App {
 	public static final Logger LOG = Logger.getLogger("stag");
 
 	static {
-		ConsoleHandler handler = new ConsoleHandler();
-		handler.setLevel(Level.ALL);
+//		ConsoleHandler handler = new ConsoleHandler();
+//		handler.setLevel(Level.ALL);
 		LOG.setLevel(Level.ALL);
-		LOG.addHandler(handler);
+//		LOG.addHandler(handler);
 	}
 	
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, ParseException {
 		LOG.entering(App.class.getName(), "main", args);
 		
 		if(args.length < 1) {
@@ -36,8 +38,9 @@ public class App {
 		final String source = args[args.length - 1];
 		LOG.fine("Source file: " + source);
 		
-		Lexer lexer = Lexer.analyse(source);
-		stag.lang.comp.Compiler.compiler(lexer);
+		final Lexer lexer = new Lexer(source);
+		final Compiler compiler = new Compiler(lexer);
+		compiler.compile();
 		
 		LOG.exiting(App.class.getName(), "main");
 	}

@@ -1,0 +1,8 @@
+.class
+  .constant
+    1: utf8 "Hello"
+    2: class 1
+    3: utf8 "java/lang/Object"
+    4: class 3
+  .this 2
+  .super 4
