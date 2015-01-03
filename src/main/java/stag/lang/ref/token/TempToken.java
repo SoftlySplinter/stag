@@ -7,16 +7,14 @@ import java.util.Collection;
 import stag.lang.ref.Token;
 
 public class TempToken implements Token {
-
+	private String cur = "";
 	@Override
 	public boolean hasChildren() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public Collection<Token> getChildren() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -27,8 +25,8 @@ public class TempToken implements Token {
 
 	@Override
 	public boolean handle(int token, int offset) throws ParseException {
-		// TODO Auto-generated method stub
-		return false;
+		cur += (char) token;
+		return cur.endsWith(".end");
 	}
 
 }

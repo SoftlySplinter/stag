@@ -22,11 +22,18 @@
     20: utf8 "(Ljava/lang/Object;)V"
     21: descriptor 19 20
     22: method 18 21
+  .end
+  
   .access public
   .this 2
   .super 4
+  
   .interfaces
+  .end
+  
   .fields
+  .end
+  
   .methods
     .method
       .access public, static
@@ -37,14 +44,24 @@
           .name 8
           .stack 10
           .locals 10
+          
           .code
             0:  ldc #16
             3:  astore_1
             4:  getstatic #14
             7:  aload_1
-          	8:  invokevirtual #22
-          	11: return
-      	  .exceptions
-      	  .attributes
-  .attributes
+            8:  invokevirtual #22
+            11: return
+          .end
+          
+          .exceptions
+          .end exceptions
+          
+          .attributes
+          .end attributes
+        .end
+    .end
+  .end
   
+  .attributes
+  .end

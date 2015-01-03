@@ -9,7 +9,7 @@ import stag.lang.App;
 import stag.lang.ref.Token;
 import stag.lang.ref.Utils;
 
-public class ThisToken implements Token {
+public class ConstantReferenceToken implements Token {
 	private short value = 0;
 	private String curToken = "";
 	private boolean finalised = false;

@@ -15,8 +15,8 @@ public class ClassToken implements Token {
 	
 	private ConstPoolToken constantPool = new ConstPoolToken();
 	private Token accessFlags = new AccessFlagToken();
-	private ThisToken thisReference = new ThisToken();
-	private Token superReference = new ThisToken();
+	private ConstantReferenceToken thisReference = new ConstantReferenceToken();
+	private Token superReference = new ConstantReferenceToken();
 	private Token interfaceTable = new TempToken();
 	private Token fieldTable = new TempToken();
 	private Token methodTable = new MethodTableToken();
@@ -58,7 +58,7 @@ public class ClassToken implements Token {
 			
 			if(delegateFinished) {
 				this.currentDelegate = null;
-				this.currentToken = ("" + (char) token).trim();
+				this.currentToken = "";
 			}
 		} else {
 			if(!Character.isWhitespace(token)) {				
@@ -68,35 +68,44 @@ public class ClassToken implements Token {
 			} else if(!this.currentToken.isEmpty()) {
 				switch(currentToken) {
 				case ".constants":
-					this.currentDelegate = this.constantPool;
+					setDelegate(this.constantPool, offset);
 					break;
 				case ".access":
-					this.currentDelegate = this.accessFlags;
+					setDelegate(this.accessFlags, offset);
 					break;
 				case ".this":
-					this.currentDelegate = this.thisReference;
+					this.setDelegate(this.thisReference, offset);
 					break;
 				case ".super":
-					this.currentDelegate = this.superReference;
+					this.setDelegate(this.superReference, offset);
 					break;
 				case ".interfaces":
-					this.currentDelegate = this.interfaceTable;
+					this.setDelegate(this.interfaceTable, offset);
 					break;
 				case ".fields":
-					this.currentDelegate = this.fieldTable;
+					this.setDelegate(this.fieldTable, offset);
 					break;
 				case ".methods":
-					this.currentDelegate = this.methodTable;
+					this.setDelegate(this.methodTable, offset);
 					break;
 				case ".attributes":
-					this.currentDelegate = this.attributeTable;
+					this.setDelegate(this.attributeTable, offset);
 					break;
+				default:
+					throw new ParseException("No such class element: " + this.currentToken, offset);
 				}
 			}
 		}
 		
 		App.LOG.exiting(getClass().getName(), "handle", ret);
 		return ret;
+	}
+
+	private void setDelegate(Token delegate, int offset) throws ParseException {
+		if(this.currentDelegate != null) {
+			throw new ParseException("Delegate already exists", offset);
+		}
+		this.currentDelegate = delegate;
 	}
 
 }

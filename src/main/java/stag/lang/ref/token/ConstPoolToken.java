@@ -54,7 +54,7 @@ public class ConstPoolToken implements Token {
 		
 		if (!this.finalised) {
 			if (this.currentDelegate == null) {
-				if ((char) token == '.') {
+				if (this.curToken.equals(".end")) {
 					this.finalised = true;
 				} else if((char) token == ':') {
 					this.curIndex = Short.parseShort(this.curToken);
