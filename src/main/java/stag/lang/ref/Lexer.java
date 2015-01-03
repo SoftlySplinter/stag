@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class Lexer {
 		App.LOG.exiting(getClass().getName(), "<init>");
 	}
 	
-	public final Token parse() throws IOException {
+	public final Token parse() throws IOException, ParseException {
 		App.LOG.entering(getClass().getName(), "parse");
 		
 		final String className = source.replace(".stag", "");
@@ -47,12 +48,14 @@ public class Lexer {
 		}
 	}
 
-	private final Token parse(BufferedReader reader) throws IOException {
+	private final Token parse(BufferedReader reader) throws IOException, ParseException {
 		App.LOG.entering(getClass().getName(), "parse", reader);
 		final Token token = new InitialToken();
 		
+		int offset = 0;
 		for(int tok = reader.read(); tok != -1; tok = reader.read()) {
-			token.handle(tok);
+			token.handle(tok, offset);
+			offset++;
 		}
 		
 		App.LOG.exiting(getClass().getName(), "parse", token);

@@ -7,6 +7,7 @@ import java.util.Collection;
 
 import stag.lang.App;
 import stag.lang.ref.Token;
+import stag.lang.ref.Utils;
 
 public class InitialToken implements Token {
 	public static final int MAGIC_NUMBER = 0xCAFEBABE;
@@ -25,6 +26,7 @@ public class InitialToken implements Token {
 
 	@Override
 	public byte[] getBytes() throws ParseException {
+		App.LOG.entering(getClass().getName(), "getBytes");
 		if(!this.hasChildren()) {
 			ParseException classNotFound = new ParseException("Did not find class token.", -1);
 			App.LOG.throwing(this.getClass().getName(), "getBytes", classNotFound);
@@ -33,16 +35,18 @@ public class InitialToken implements Token {
 		
 		final ByteBuffer buffer = ByteBuffer.allocate(4);
 		buffer.putInt(MAGIC_NUMBER);
+		
+		App.LOG.exiting(getClass().getName(), "getBytes", Utils.str(buffer.array()));
 		return buffer.array();
 	}
 
 	@Override
-	public boolean handle(int token) {
-		App.LOG.entering(getClass().getName(), "handle", token);
+	public boolean handle(final int token, final int offset) throws ParseException {
+		App.LOG.entering(getClass().getName(), "handle", (char) token);
 		boolean ret = false;
 		if(this.hasChildren()) {
 			App.LOG.fine("Delegating to child class token");
-			ret = this.classToken.handle(token);
+			ret = this.classToken.handle(token, offset);
 		} else {
 			final String next = (this.curToken + (char) token).trim();
 			if (!this.curToken.equals(next)) {

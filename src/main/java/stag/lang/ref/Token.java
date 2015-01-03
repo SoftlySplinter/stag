@@ -7,5 +7,5 @@ public interface Token {
 	public boolean hasChildren();
 	public Collection<Token> getChildren();
 	public byte[] getBytes() throws ParseException;
-	public boolean handle(int token);
+	public boolean handle(int token, int offset) throws ParseException;
 }

@@ -2,6 +2,7 @@ package stag.lang.comp;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -43,6 +44,14 @@ public class Compiler {
 
 		try (OutputStream out = Files.newOutputStream(classFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
 			compile(tokens, out);
+		}
+		
+		try(InputStream in = Files.newInputStream(classFile.toPath(),  StandardOpenOption.READ)) {
+			String content = "";
+			for(int i = in.read(); i != -1; i = in.read()) {
+				content += String.format("%02x", i);
+			}
+			App.LOG.finest(content);
 		}
 
 		App.LOG.exiting(getClass().getName(), "compile");

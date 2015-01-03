@@ -14,8 +14,13 @@ public class ClassToken implements Token {
 	public static final short MINOR_VERSION = 0x0000;
 	
 	private ConstPoolToken constantPool = new ConstPoolToken();
+	private Token accessFlags = new AccessFlagToken();
 	private ThisToken thisReference = new ThisToken();
-	private Token superReference;
+	private Token superReference = new ThisToken();
+	private Token interfaceTable = new TempToken();
+	private Token fieldTable = new TempToken();
+	private Token methodTable = new TempToken();
+	private Token attributeTable = new TempToken();
 	
 	private Token currentDelegate = null;
 	private String currentToken = "";
@@ -27,7 +32,7 @@ public class ClassToken implements Token {
 
 	@Override
 	public Collection<Token> getChildren() {
-		return Arrays.asList(constantPool, thisReference);//, superReference);
+		return Arrays.asList(constantPool, accessFlags, thisReference, superReference, interfaceTable, fieldTable, methodTable, attributeTable);
 	}
 
 	@Override
@@ -43,25 +48,36 @@ public class ClassToken implements Token {
 	}
 
 	@Override
-	public boolean handle(int token) {
-		App.LOG.entering(getClass().getName(), "handle");
+	public boolean handle(final int token, final int offset) throws ParseException {
+		App.LOG.entering(getClass().getName(), "handle", (char) token);
 		
 		boolean ret = false;
 		
 		if(this.currentDelegate != null) {
-			final boolean delegateFinished = this.currentDelegate.handle(token);
+			final boolean delegateFinished = this.currentDelegate.handle(token, offset);
 			
 			if(delegateFinished) {
 				this.currentDelegate = null;
+				this.currentToken = ("" + (char) token).trim();
 			}
 		} else {
-			if(!Character.isWhitespace(token)) {
+			if(!Character.isWhitespace(token)) {				
 				currentToken += (char) token;
 				
+				App.LOG.fine(currentToken);
+				
 				switch(currentToken) {
+				case ".constants":
+					this.currentDelegate = this.constantPool;
+					break;
+				case ".access":
+					this.currentDelegate = this.accessFlags;
+					break;
 				case ".this":
 					this.currentDelegate = this.thisReference;
-					this.currentToken = "";
+					break;
+				case ".super":
+					this.currentDelegate = this.superReference;
 					break;
 				}
 			}

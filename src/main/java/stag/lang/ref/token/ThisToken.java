@@ -42,22 +42,22 @@ public class ThisToken implements Token {
 	}
 
 	@Override
-	public boolean handle(int token) {
-		App.LOG.entering(this.getClass().getName(), "handle");
-		boolean ret = false;
-		if (this.finalised) {
-			ret = true;
-		} else {
+	public boolean handle(final int token, final int offset) {
+		App.LOG.entering(this.getClass().getName(), "handle", (char) token);
+		if (!this.finalised) {
 			if (this.curToken.isEmpty()) {
 				if (!Character.isWhitespace(token)) {
 					this.curToken += (char) token;
-				} else {
-
+				}
+			} else {
+				if(Character.isWhitespace(token)) {
+					this.finalised = true;
+					this.value = Short.parseShort(curToken);
 				}
 			}
 		}
-		App.LOG.exiting(this.getClass().getName(), "handle", ret);
-		return ret;
+		App.LOG.exiting(this.getClass().getName(), "handle", this.finalised);
+		return this.finalised;
 	}
 
 }
