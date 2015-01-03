@@ -42,7 +42,7 @@ public class Compiler {
 		
 		final Token tokens = lexer.parse();
 
-		try (OutputStream out = Files.newOutputStream(classFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+		try (OutputStream out = Files.newOutputStream(classFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
 			compile(tokens, out);
 		}
 		

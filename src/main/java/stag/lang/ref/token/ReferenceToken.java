@@ -15,6 +15,7 @@ public class ReferenceToken implements Token {
 	private boolean atValue = false;
 	private boolean finalised = false;
 	private boolean quote = false;
+	private boolean value1Finalised = false;
 
 	@Override
 	public boolean hasChildren() {
@@ -128,6 +129,12 @@ public class ReferenceToken implements Token {
 				case "utf8": 
 					this.finalised = parseStringValue((char) token);
 					break;
+				case "field":
+				case "method":
+				case "interface":
+				case "descriptor":
+					this.finalised = parseReference((char) token);
+					break;
 				default:
 					this.finalised = parsePrimativeValue((char) token);
 				}
@@ -136,6 +143,24 @@ public class ReferenceToken implements Token {
 
 		App.LOG.entering(getClass().getName(), "handle", this.finalised);
 		return this.finalised;
+	}
+
+	private boolean parseReference(char token) {
+		if (Character.isWhitespace(token)) {
+			if(!this.strValue2.isEmpty()) {
+				return true;
+			} else if(!this.strValue.isEmpty()) {
+				this.value1Finalised = true;
+			}
+			return false;
+		} else {
+			if(!this.value1Finalised) {
+				this.strValue += token;
+			} else {
+				this.strValue2 += token;
+			}
+			return false;
+		}
 	}
 
 	private boolean parseStringValue(char token) {

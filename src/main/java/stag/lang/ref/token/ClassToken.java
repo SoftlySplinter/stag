@@ -19,7 +19,7 @@ public class ClassToken implements Token {
 	private Token superReference = new ThisToken();
 	private Token interfaceTable = new TempToken();
 	private Token fieldTable = new TempToken();
-	private Token methodTable = new TempToken();
+	private Token methodTable = new MethodTableToken();
 	private Token attributeTable = new TempToken();
 	
 	private Token currentDelegate = null;
@@ -65,7 +65,7 @@ public class ClassToken implements Token {
 				currentToken += (char) token;
 				
 				App.LOG.fine(currentToken);
-				
+			} else if(!this.currentToken.isEmpty()) {
 				switch(currentToken) {
 				case ".constants":
 					this.currentDelegate = this.constantPool;
@@ -78,6 +78,18 @@ public class ClassToken implements Token {
 					break;
 				case ".super":
 					this.currentDelegate = this.superReference;
+					break;
+				case ".interfaces":
+					this.currentDelegate = this.interfaceTable;
+					break;
+				case ".fields":
+					this.currentDelegate = this.fieldTable;
+					break;
+				case ".methods":
+					this.currentDelegate = this.methodTable;
+					break;
+				case ".attributes":
+					this.currentDelegate = this.attributeTable;
 					break;
 				}
 			}

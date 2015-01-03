@@ -2,16 +2,16 @@ package stag.lang.ref.token;
 
 import java.nio.ByteBuffer;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import stag.lang.App;
 import stag.lang.ref.Token;
 import stag.lang.ref.Utils;
 
 public class ConstPoolToken implements Token {
-	private final Map<Short, Token> constants = new HashMap<Short, Token>(); 
+	private final List<Token> constants = new ArrayList<Token>(); 
 	private boolean finalised = false;
 	private Token currentDelegate;
 	private short curIndex;
@@ -29,7 +29,7 @@ public class ConstPoolToken implements Token {
 
 	@Override
 	public Collection<Token> getChildren() {
-		return constants.values();
+		return constants;
 	}
 	
 	public short getLength() {
@@ -65,7 +65,7 @@ public class ConstPoolToken implements Token {
 			} else {
 				final boolean delegateFinished = this.currentDelegate.handle(token, offset);
 				if(delegateFinished) {
-					this.constants.put(this.curIndex, currentDelegate);
+					this.constants.add(this.curIndex - 1, currentDelegate);
 					this.currentDelegate = null;
 					this.curToken = "";
 				}
