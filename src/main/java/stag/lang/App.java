@@ -38,9 +38,15 @@ public class App {
 		final String source = args[args.length - 1];
 		LOG.fine("Source file: " + source);
 		
+		
 		final Lexer lexer = new Lexer(source);
 		final Compiler compiler = new Compiler(lexer);
-		compiler.compile();
+		
+		try  {
+			compiler.compile();
+		} catch(ParseException e) {
+			System.err.printf("Syntax Error [%s %d]: %s\n", source, e.getErrorOffset(), e.getMessage());
+		}
 		
 		LOG.exiting(App.class.getName(), "main");
 	}

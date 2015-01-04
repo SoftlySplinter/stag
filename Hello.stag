@@ -5,7 +5,7 @@
     3:  utf8 "java/lang/Object"
     4:  class 3
     5:  utf8 "main"
-    6:  utf8 "([java/lang/String;)V"
+    6:  utf8 "([Ljava/lang/String;)V"
     7:  descriptor 5 6
     8:  utf8 "Code"
     9:  utf8 "java/lang/System"
@@ -38,7 +38,7 @@
     .method
       .access public, static
       .name 5
-      .descriptor 7
+      .descriptor 6
       .attributes
         .code
           .name 8
@@ -55,11 +55,12 @@
           .end
           
           .exceptions
-          .end exceptions
+          .end
           
           .attributes
-          .end attributes
+          .end
         .end
+      .end
     .end
   .end
   
