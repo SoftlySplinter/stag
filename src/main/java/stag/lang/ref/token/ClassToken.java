@@ -13,18 +13,15 @@ public class ClassToken implements Token {
 	public static final short MAJOR_VERSION = 0x0033;
 	public static final short MINOR_VERSION = 0x0000;
 	
-	private ConstPoolToken constantPool = new ConstPoolToken();
-	private Token accessFlags = new AccessFlagToken();
-	private ConstantReferenceToken thisReference = new ConstantReferenceToken();
-	private Token superReference = new ConstantReferenceToken();
-	private Token interfaceTable = new TempToken();
-	private Token fieldTable = new TempToken();
-	private Token methodTable = new MethodTableToken();
-	private Token attributeTable = new TempToken();
+	private ConstPoolToken constantPool = new ConstPoolToken(this);
+	private Token accessFlags = new AccessFlagToken(this);
+	private Token thisReference = null;
+	private Token superReference = null;
+	private Token interfaceTable = null;
+	private Token fieldTable = null;
+	private Token methodTable = null;
+	private Token attributeTable = null;
 	
-	private Token currentDelegate = null;
-	private String currentToken = "";
-
 	@Override
 	public boolean hasChildren() {
 		return true;
@@ -47,65 +44,48 @@ public class ClassToken implements Token {
 		return buffer.array();
 	}
 
+	
 	@Override
-	public boolean handle(final int token, final int offset) throws ParseException {
-		App.LOG.entering(getClass().getName(), "handle", (char) token);
-		
-		boolean ret = false;
-		
-		if(this.currentDelegate != null) {
-			final boolean delegateFinished = this.currentDelegate.handle(token, offset);
-			
-			if(delegateFinished) {
-				this.currentDelegate = null;
-				this.currentToken = "";
-			}
-		} else {
-			if(!Character.isWhitespace(token)) {				
-				currentToken += (char) token;
-				
-				App.LOG.fine(currentToken);
-			} else if(!this.currentToken.isEmpty()) {
-				switch(currentToken) {
-				case ".constants":
-					setDelegate(this.constantPool, offset);
-					break;
-				case ".access":
-					setDelegate(this.accessFlags, offset);
-					break;
-				case ".this":
-					this.setDelegate(this.thisReference, offset);
-					break;
-				case ".super":
-					this.setDelegate(this.superReference, offset);
-					break;
-				case ".interfaces":
-					this.setDelegate(this.interfaceTable, offset);
-					break;
-				case ".fields":
-					this.setDelegate(this.fieldTable, offset);
-					break;
-				case ".methods":
-					this.setDelegate(this.methodTable, offset);
-					break;
-				case ".attributes":
-					this.setDelegate(this.attributeTable, offset);
-					break;
-				default:
-					throw new ParseException("No such class element: " + this.currentToken, offset);
-				}
-			}
+	public Token handle(double nval) throws ParseException {
+		return this;
+	}
+	
+	@Override
+	public Token handle(String sval) throws ParseException {
+		App.LOG.entering(getClass().getName(), "handle", sval);
+		Token next = this;
+		switch(sval) {
+		case "constants":
+			next = this.constantPool;
+			break;
+		case "access":
+			next = this.accessFlags;
+			break;
+		case "this":
+			next = this.thisReference;
+			break;
+		case "super":
+			next = this.superReference;
+			break;
+		case "interfaces":
+			next = this.interfaceTable;
+			break;
+		case "fields":
+			next = this.fieldTable;
+			break;
+		case "methods":
+			next = this.methodTable;
+			break;
+		case "attributes":
+			next = this.attributeTable;
+			break;
+		default:
+			ParseException t = new ParseException("Illegal token: " + sval, -1);
+			App.LOG.throwing(getClass().getName(), "handle", t);
+			throw t;
 		}
 		
-		App.LOG.exiting(getClass().getName(), "handle", ret);
-		return ret;
+		App.LOG.exiting(getClass().getName(), "handle", next);
+		return next;
 	}
-
-	private void setDelegate(Token delegate, int offset) throws ParseException {
-		if(this.currentDelegate != null) {
-			throw new ParseException("Delegate already exists", offset);
-		}
-		this.currentDelegate = delegate;
-	}
-
 }

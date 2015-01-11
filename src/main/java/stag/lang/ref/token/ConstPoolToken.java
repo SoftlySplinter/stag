@@ -12,16 +12,12 @@ import stag.lang.ref.Utils;
 
 public class ConstPoolToken implements Token {
 	private final List<Token> constants = new ArrayList<Token>(); 
-	private boolean finalised = false;
-	private Token currentDelegate;
-	private short curIndex;
-	private String curToken = "";
-
-	public int getClassReference(String className) {
-		// TODO Auto-generated method stub
-		return 0;
+	private final Token parent;
+	
+	public ConstPoolToken(Token parent) {
+		this.parent = parent;
 	}
-
+	
 	@Override
 	public boolean hasChildren() {
 		return !constants.isEmpty();
@@ -49,30 +45,30 @@ public class ConstPoolToken implements Token {
 	}
 
 	@Override
-	public boolean handle(final int token, final int offset) throws ParseException {
-		App.LOG.entering(getClass().getName(), "handle", (char) token);
+	public Token handle(String sval) throws ParseException {
+		App.LOG.entering(getClass().getName(), "handle", sval);
 		
-		if (!this.finalised) {
-			if (this.currentDelegate == null) {
-				if (this.curToken.equals(".end")) {
-					this.finalised = true;
-				} else if((char) token == ':') {
-					this.curIndex = Short.parseShort(this.curToken);
-					this.currentDelegate = new ReferenceToken();
-				} else if(!Character.isWhitespace(token)) {
-					this.curToken += (char) token;
-				}
-			} else {
-				final boolean delegateFinished = this.currentDelegate.handle(token, offset);
-				if(delegateFinished) {
-					this.constants.add(this.curIndex - 1, currentDelegate);
-					this.currentDelegate = null;
-					this.curToken = "";
-				}
-			}
+		switch(sval) {
+		case "end":
+			App.LOG.exiting(getClass().getName(), "handle", this.parent);
+			return this.parent;
+		default:
+			ParseException e = new ParseException("Illegal Token: " + sval, -1);
+			App.LOG.throwing(getClass().getName(), "handle", e);
+			throw e;
 		}
+	}
+	
+	@Override
+	public Token handle(double nval) throws ParseException {
+		App.LOG.entering(getClass().getName(), "handle", nval);
 		
-		App.LOG.exiting(getClass().getName(), "handle", this.finalised);
-		return this.finalised;
+		int index = (int) nval;
+		Token t = new ConstantToken(this);
+		
+		this.constants.add(index - 1, t);
+		
+		App.LOG.exiting(getClass().getName(), "handle", t);
+		return t;
 	}
 }

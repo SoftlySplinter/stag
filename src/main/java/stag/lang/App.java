@@ -21,7 +21,7 @@ public class App {
 		ConsoleHandler handler = new ConsoleHandler();
 		handler.setLevel(Level.ALL);
 		LOG.setLevel(Level.ALL);
-		LOG.addHandler(handler);
+//		LOG.addHandler(handler);
 	}
 	
 	public static void main(String[] args) throws IOException, ParseException {

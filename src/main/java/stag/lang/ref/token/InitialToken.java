@@ -39,28 +39,26 @@ public class InitialToken implements Token {
 		App.LOG.exiting(getClass().getName(), "getBytes", Utils.str(buffer.array()));
 		return buffer.array();
 	}
-
+	
 	@Override
-	public boolean handle(final int token, final int offset) throws ParseException {
-		App.LOG.entering(getClass().getName(), "handle", (char) token);
-		boolean ret = false;
-		if(this.hasChildren()) {
-			App.LOG.fine("Delegating to child class token");
-			ret = this.classToken.handle(token, offset);
+	public Token handle(final String sval) throws ParseException {
+		App.LOG.entering(getClass().getName(), "handle", sval);
+		if(sval.equals("class")) {
+			this.classToken = new ClassToken();
+
+			App.LOG.exiting(getClass().getName(), "handle", sval);
+			return this.classToken;
 		} else {
-			final String next = (this.curToken + (char) token).trim();
-			if (!this.curToken.equals(next)) {
-				this.curToken = next;
-				App.LOG.fine("Current token value: " + this.curToken);
-
-				if (this.curToken.equals(".class")) {
-					App.LOG.fine("Found class token");
-					this.classToken = new ClassToken();
-				}
-			}
+			ParseException t = new ParseException("Illegal token: " + sval, -1); 
+			App.LOG.throwing(getClass().getName(), "handle", t);
+			throw t;
 		}
-		App.LOG.exiting(getClass().getName(), "handle", ret);
-		return ret;
 	}
-
+	
+	@Override
+	public Token handle(final double nval) throws ParseException {
+		App.LOG.entering(getClass().getName(), "handle", nval);
+		App.LOG.exiting(getClass().getName(), "handle", this);
+		return this;
+	}
 }
